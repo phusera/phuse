@@ -172,7 +172,8 @@ Cookies are limited to 4 KB of text in most browsers.
 Some users configure their browsers to not accept cookies at all. Most search engines ignore cookies too. Make sure that your application still works without cookies.
 Cookies are stored at client side and are not encrypted in any way. Whatever you store in a cookie, the user can read it. Worse than that, an attacker might be able to steal a user’s cookies through XSS vulnerabilities on your side. Some viruses are known to read the browser cookies, too. Thus, never store confidential information in cookies.
 Cookies are easily forged by malicious clients. Do not trust cookies.
-Signed Cookies
+
+# Signed Cookies
 
 As mentioned above, cookies are easily forged by malicious clients. Bottle can cryptographically sign your cookies to prevent this kind of manipulation. All you have to do is to provide a signature key via the secret keyword argument whenever you read or set a cookie and keep that key a secret. As a result, Request.get_cookie() will return None if the cookie is not signed or the signature keys don’t match:
 
@@ -196,4 +197,4 @@ def restricted_area():
         return "You are not logged in. Access denied."
 
 ```
-In addition, Bottle automatically pickles and unpickles any data stored to signed cookies. This allows you to store any pickle-able object (not only strings) to cookies, as long as the pickled data does not exceed the 4 KB limit.
+In addition, Phuse automatically pickles and unpickles any data stored to signed cookies. This allows you to store any pickle-able object (not only strings) to cookies, as long as the pickled data does not exceed the 4 KB limit.
