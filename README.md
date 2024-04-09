@@ -26,3 +26,15 @@ def index(name):
 
 run(host='localhost', port=8080)
 ```
+
+Simpler Version:
+
+```python
+from phuse import route, run
+
+@route('/')
+def index():
+    return '<b>Hello World! I am using Phuse!</b>!'
+
+run(host='localhost', port=8080)
+```
