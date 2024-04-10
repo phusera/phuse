@@ -298,3 +298,15 @@ Here is an example template:
 
 Templates are cached in memory after compilation. Modifications made to the template files will have no affect until you clear the template cache. Call bottle.TEMPLATES.clear() to do so. Caching is disabled in debug mode.
 
+# AUTO RELOADING
+During development, you have to restart the server a lot to test your recent changes. The auto reloader can do this for you. Every time you edit a module file, the reloader restarts the server process and loads the newest version of your code.
+
+```python
+from bottle import run
+run(reloader=True)
+```
+How it works: the main process will not start a server, but spawn a new child process using the same command line arguments used to start the main process. All module-level code is executed at least twice! Be careful.
+
+The child process will have os.environ['PHUSE_CHILD'] set to True and start as a normal non-reloading app server. As soon as any of the loaded modules changes, the child process is terminated and re-spawned by the main process. Changes in template files will not trigger a reload. Please use debug mode to deactivate template caching.
+
+The reloading depends on the ability to stop the child process. If you are running on Windows or any other operating system not supporting signal.SIGINT (which raises KeyboardInterrupt in Python), signal.SIGTERM is used to kill the child. Note that exit handlers and finally clauses, etc., are not executed after a SIGTERM.
