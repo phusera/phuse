@@ -310,7 +310,7 @@ Templates are cached in memory after compilation. Modifications made to the temp
 During development, you have to restart the server a lot to test your recent changes. The auto reloader can do this for you. Every time you edit a module file, the reloader restarts the server process and loads the newest version of your code.
 
 ```python
-from bottle import run
+from phuse import run
 run(reloader=True)
 ```
 How it works: the main process will not start a server, but spawn a new child process using the same command line arguments used to start the main process. All module-level code is executed at least twice! Be careful.
