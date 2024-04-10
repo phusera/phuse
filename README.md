@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="IMG_1295.jpeg"/>
+  <img src="ext/phuse_logo.jpeg"/>
 </p>
 
 
