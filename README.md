@@ -16,6 +16,7 @@ Server: Built-in HTTP development server and support for paste, fapws3, bjoern, 
 
 https://github.com/phusera/phuse/assets/101386337/b2f1f56e-9736-4f9e-9b4e-81ec03dd1366
 
+![Alt](https://repobeats.axiom.co/api/embed/e2fed0b6f396da4e8ffc6c3e562656ac025a369d.svg "Repobeats analytics image")
 
 # Install
 Install the latest stable release using```pip install phuse```. Phuse runs on Python 2.7 and 3.6+
