@@ -198,3 +198,103 @@ def restricted_area():
 
 ```
 In addition, Phuse automatically pickles and unpickles any data stored to signed cookies. This allows you to store any pickle-able object (not only strings) to cookies, as long as the pickled data does not exceed the 4 KB limit.
+
+# REQUEST DATA
+
+Cookies, HTTP header, HTML <form> fields and other request data is available through the global request object. This special object always refers to the current request, even in multi-threaded environments where multiple client connections are handled at the same time:
+
+```python
+from phuse import request, route, template
+
+@route('/hello')
+def hello():
+    name = request.cookies.username or 'Guest'
+    return template('Hello {{name}}', name=name)
+```
+
+The request object is a subclass of BaseRequest and has a very rich API to access data. We only cover the most commonly used features here, but it should be enough to get started.
+
+
+# FILE UPLOADS
+To support file uploads, we have to change the <form> tag a bit. First, we tell the browser to encode the form data in a different way by adding an enctype="multipart/form-data" attribute to the <form> tag. Then, we add <input type="file" /> tags to allow the user to select a file. Here is an example:
+
+```python
+<form action="/upload" method="post" enctype="multipart/form-data">
+  Category:      <input type="text" name="category" />
+  Select a file: <input type="file" name="upload" />
+  <input type="submit" value="Start upload" />
+</form>
+```
+Phuse stores file uploads in BaseRequest.files as FileUpload instances, along with some metadata about the upload. Let us assume you just want to save the file to disk:
+
+```python
+@route('/upload', method='POST')
+def do_upload():
+    category   = request.forms.get('category')
+    upload     = request.files.get('upload')
+    name, ext = os.path.splitext(upload.filename)
+    if ext not in ('.png','.jpg','.jpeg'):
+        return 'File extension not allowed.'
+
+    save_path = get_save_path_for_category(category)
+    upload.save(save_path) # appends upload.filename automatically
+    return 'OK'
+```
+
+FileUpload.filename contains the name of the file on the clients file system, but is cleaned up and normalized to prevent bugs caused by unsupported characters or path segments in the filename. If you need the unmodified name as sent by the client, have a look at FileUpload.raw_filename.
+
+The FileUpload.save method is highly recommended if you want to store the file to disk. It prevents some common errors (e.g. it does not overwrite existing files unless you tell it to) and stores the file in a memory efficient way. You can access the file object directly via FileUpload.file. Just be careful.
+
+
+# WSGI ENVIRONMENT
+Each BaseRequest instance wraps a WSGI environment dictionary. The original is stored in BaseRequest.environ, but the request object itself behaves like a dictionary, too. Most of the interesting data is exposed through special methods or attributes, but if you want to access WSGI environ variables directly, you can do so:
+
+```python
+@route('/my_ip')
+def show_ip():
+    ip = request.environ.get('REMOTE_ADDR')
+    # or ip = request.get('REMOTE_ADDR')
+    # or ip = request['REMOTE_ADDR']
+    return template("Your IP is: {{ip}}", ip=ip)
+```
+
+# TEMPLATES
+
+Phuse comes with a fast and powerful built-in template engine called SimpleTemplate Engine. To render a template you can use the template() function or the view() decorator. All you have to do is to provide the name of the template and the variables you want to pass to the template as keyword arguments. Here’s a simple example of how to render a template:
+
+```python
+@route('/hello')
+@route('/hello/<name>')
+def hello(name='World'):
+    return template('hello_template', name=name)
+```
+This will load the template file hello_template.tpl and render it with the name variable set. Bottle will look for templates in the ./views/ folder or any folder specified in the bottle.TEMPLATE_PATH list.
+
+The view() decorator allows you to return a dictionary with the template variables instead of calling template():
+
+```python
+@route('/hello')
+@route('/hello/<name>')
+@view('hello_template')
+def hello(name='World'):
+    return dict(name=name)
+```
+## Syntax
+
+The template syntax is a very thin layer around the Python language. Its main purpose is to ensure correct indentation of blocks, so you can format your template without worrying about indentation. Follow the link for a full syntax description: SimpleTemplate Engine
+
+Here is an example template:
+
+```python
+%if name == 'World':
+    <h1>Hello {{name}}!</h1>
+    <p>This is a test.</p>
+%else:
+    <h1>Hello {{name.title()}}!</h1>
+    <p>How are you?</p>
+%end
+```
+## Caching
+
+Templates are cached in memory after compilation. Modifications made to the template files will have no affect until you clear the template cache. Call bottle.TEMPLATES.clear() to do so. Caching is disabled in debug mode.
+
