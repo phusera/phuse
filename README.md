@@ -12,10 +12,15 @@ Utilities: Convenient access to form data, file uploads, cookies, headers and ot
 Server: Built-in HTTP development server and support for paste, fapws3, bjoern, Google App Engine, cherrypy or any other WSGI capable HTTP server.
 
 
+## Python implementation
+
+https://github.com/phusera/phuse/assets/101386337/b2f1f56e-9736-4f9e-9b4e-81ec03dd1366
+
+
 # Install
 Install the latest stable release using```pip install phuse```. Phuse runs on Python 2.7 and 3.6+
 
-# Example: "Hello World" with Phuse
+# Example: "Hello localhost!" with Phuse
 
 ```python
 from phuse import route, run, template
